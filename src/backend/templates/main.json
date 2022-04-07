@@ -10,14 +10,16 @@
   },
   "parameters": {
     "projectName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "bpajphtest8"
     },
     "repositoryToken": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "repositoryUrl": {
       "type": "string",
-      "defaultValue" : "https://github.com/jameshoff-msft/easyButton"
+      "defaultValue": "https://github.com/jameshoff-msft/easyButton"
     },
     "formrecName": {
       "type": "string",
@@ -282,6 +284,7 @@
       ]
     },
     {
+
       "apiVersion": "2017-05-10",
       "name": "[concat('deployPrivateEndpoint-', variables('formrecPrivateEndpoints')[copyIndex()].privateEndpoint.name)]",
       "type": "Microsoft.Resources/deployments",
@@ -367,328 +370,367 @@
       }
     },
     {
-        "type": "Microsoft.Storage/storageAccounts",
-        "apiVersion": "2021-08-01",
-        "name": "[parameters('storageAccountName')]",
-        "location": "[parameters('primaryRegion')]",
-        "sku": {
-          "name": "[variables('storageAccountSkuName')]"
-        },
-        "kind": "StorageV2",
-        "properties": {
-          "accessTier": "Hot"
-        }
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-08-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('primaryRegion')]",
+      "sku": {
+        "name": "[variables('storageAccountSkuName')]"
       },
-      {
-        "type": "Microsoft.Storage/storageAccounts/blobServices",
-        "apiVersion": "2021-08-01",
-        "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-        ]
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-        "apiVersion": "2021-08-01",
-        "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'test')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-        ]
-      },
-      {
-        "type": "Microsoft.DocumentDB/databaseAccounts",
-        "apiVersion": "2021-01-15",
-        "name": "[variables('accountName_var')]",
-        "kind": "GlobalDocumentDB",
-        "location": "[parameters('primaryRegion')]",
-        "properties": {
-          "consistencyPolicy": "[variables('consistencyPolicy')[parameters('defaultConsistencyLevel')]]",
-          "locations": "[variables('locations')]",
-          "databaseAccountOfferType": "Standard",
-          "enableAutomaticFailover": "[parameters('automaticFailover')]"
-        }
-      },
-      {
-        "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
-        "apiVersion": "2021-01-15",
-        "name": "[format('{0}/{1}', variables('accountName_var'), parameters('databaseName'))]",
-        "properties": {
-          "resource": {
-            "id": "[parameters('databaseName')]"
-          }
-        },
-        "dependsOn": [
-          "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var'))]"
-        ]
-      },
-      {
-        "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
-        "apiVersion": "2021-01-15",
-        "name": "[format('{0}/{1}/{2}', variables('accountName_var'), parameters('databaseName'), parameters('containerName'))]",
-        "properties": {
-          "resource": {
-            "id": "[parameters('containerName')]",
-            "partitionKey": {
-              "paths": [
-                "/records"
-              ],
-              "kind": "Hash"
-            },
-            "indexingPolicy": {
-              "indexingMode": "consistent",
-              "includedPaths": [
-                {
-                  "path": "/*"
-                }
-              ],
-              "excludedPaths": [
-                {
-                  "path": "/myPathToNotIndex/*"
-                }
-              ]
-            },
-            "defaultTtl": 86400
-          },
-          "options": {
-            "autoscaleSettings": {
-              "maxThroughput": "[parameters('autoscaleMaxThroughput')]"
-            }
-          }
-        },
-        "dependsOn": [
-          "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('accountName_var'), parameters('databaseName'))]",
-          "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var'))]"
-        ]
-      },
-      {
-        "type": "Microsoft.CognitiveServices/accounts",
-        "apiVersion": "2021-10-01",
-        "name": "[parameters('cogServicesName')]",
-        "location": "[parameters('primaryRegion')]",
-        "sku": {
-          "name": "S0",
-          "tier": "Standard"
-        },
-        "kind": "CognitiveServices",
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.CognitiveServices/accounts",
-        "apiVersion": "2021-10-01",
-        "name": "[parameters('languageServicesName')]",
-        "location": "[parameters('languageServicesLocation')]",
-        "sku": {
-          "name": "S"
-        },
-        "kind": "TextAnalytics",
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.Web/serverfarms",
-        "apiVersion": "2020-10-01",
-        "name": "[parameters('hostingPlanName')]",
-        "location": "[parameters('primaryRegion')]",
-        "kind": "linux",
-        "sku": {
-          "name": "B1",
-          "tier": "Basic"
-        },
-        "properties": {
-          "reserved": true
-        }
-      },
-      {
-        "type": "Microsoft.Insights/components",
-        "apiVersion": "2020-02-02",
-        "name": "[parameters('applicationInsightsName')]",
-        "location": "[parameters('primaryRegion')]",
-        "kind": "string",
-        "properties": {
-          "Application_Type": "web",
-          "publicNetworkAccessForIngestion": "Enabled",
-          "publicNetworkAccessForQuery": "Enabled"
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites",
-        "apiVersion": "2020-06-01",
-        "name": "[parameters('functionAppNamePython')]",
-        "location": "[parameters('primaryRegion')]",
-        "kind": "functionapp",
-        "properties": {
-          "httpsOnly": true,
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
-          "clientAffinityEnabled": true,
-          "siteConfig": {
-            "linuxFxVersion": "Python|3.9",
-            "alwaysOn": true,
-            "appSettings": [
-              {
-                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))).InstrumentationKey]"
-              },
-              {
-                "name": "AzureWebJobsStorage",
-                "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-08-01').keys[0].value)]"
-              },
-              {
-                "name": "FUNCTIONS_EXTENSION_VERSION",
-                "value": "~4"
-              },
-              {
-                "name": "BUILD_FLAGS",
-                "value": "UseExpressBuild"
-              },
-              {
-                "name": "ENABLE_ORYX_BUILD",
-                "value": "true"
-              },
-              {
-                "name": "FUNCTIONS_WORKER_RUNTIME",
-                "value": "python"
-              },
-              {
-                "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-                "value": "1"
-              },
-              {
-                "name": "XDG_CACHE_HOME",
-                "value": "/tmp/.cache"
-              }
-            ]
-          }
-        },
-        "dependsOn": [
-          "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]",
-          "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-        ]
-      },
-      {
-        "type": "Microsoft.Web/sites",
-        "apiVersion": "2020-06-01",
-        "name": "[parameters('functionAppName')]",
-        "location": "[parameters('primaryRegion')]",
-        "kind": "functionapp",
-        "properties": {
-          "httpsOnly": true,
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
-          "clientAffinityEnabled": true,
-          "siteConfig": {
-            "appSettings": [
-              {
-                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))).InstrumentationKey]"
-              },
-              {
-                "name": "AzureWebJobsStorage",
-                "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-08-01').keys[0].value)]"
-              },
-              {
-                "name": "FUNCTIONS_EXTENSION_VERSION",
-                "value": "~4"
-              },
-              {
-                "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-08-01').keys[0].value)]"
-              },
-              {
-                "name": "FUNCTIONS_WORKER_RUNTIME",
-                "value": "node"
-              },
-              {
-                "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                "value": "~14"
-              },
-              {
-                "name": "BLOB_STORAGE_CONTAINER",
-                "value": "test"
-              },
-              {
-                "name": "COSMOSDB_CONNECTION_STRING",
-                "value": "[format('AccountEndpoint=https://{0}.documents.azure.com:443/;AccountKey={1};', parameters('cosmosdbAccountName'), listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var')), '2021-01-15').primaryMasterKey)]"
-              },
-              {
-                "name": "COSMOSDB_CONTAINER_NAME",
-                "value": "[parameters('cosmosContainerName')]"
-              },
-              {
-                "name": "COSMOSDB_DB_NAME",
-                "value": "[parameters('cosmosDbName')]"
-              },
-              {
-                "name": "OCR_ENDPOINT",
-                "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName'))).endpoint]"
-              },
-              {
-                "name": "OCR_APIKEY",
-                "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01').key1]"
-              },
-              {
-                "name": "LANGUAGE_STUDIO_PREBUILT_ENDPOINT",
-                "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('languageServicesName'))).endpoint]"
-              },
-              {
-                "name": "LANGUAGE_STUDIO_PREBUILT_APIKEY",
-                "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('languageServicesName')), '2021-10-01').key1]"
-              },
-              {
-                "name": "LANGUAGE_STUDIO_ENDPOINT",
-                "value": "https://airangerslangcnerdemo.cognitiveservices.azure.com/text/analytics/v3.2-preview.2/analyze"
-              },
-              {
-                "name": "LANGUAGE_STUDIO_APIKEY",
-                "value": "139f689301d8486d980c6ab17b773368"
-              },
-              {
-                "name": "LANGUAGE_STUDIO_PROJECT",
-                "value": "airangerscner4"
-              },
-              {
-                "name": "FORMREC_APIKEY",
-                "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts',parameters('formrecName')),'2021-04-30').key1]"
-              },
-              {
-                "name": "FORMREC_ENDPOINT",
-                "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts',parameters('formrecName')),'2021-04-30').endpoints.FormRecognizer]"
-              },
-              {
-                "name": "SPEECH_SUB_KEY",
-                "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01').key1]"
-              },
-              {
-                "name": "SPEECH_SUB_REGION",
-                "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01', 'full').location]"
-              },
-              {
-                "name": "TRANSLATE_APIKEY",
-                "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01').key1]"
-              },
-              {
-                "name": "TRANSLATE_REGION",
-                "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01', 'full').location]"
-              },
-              {
-                "name": "TRANSLATE_ENDPOINT",
-                "value": "https://api.cognitive.microsofttranslator.com/"
-              },
-              {
-                "name": "HUGGINGFACE_ENDPOINT",
-                "value": "[format('https://{0}.azurewebsites.net', parameters('functionAppNamePython'))]"
-              }
-            ]
-          }
-        },
-        "dependsOn": [
-          "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var'))]",
-          "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]",
-          "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'test')]",
-          "[resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName'))]",
-          "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
-          "[resourceId('Microsoft.CognitiveServices/accounts', parameters('languageServicesName'))]",
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-        ]
+      "kind": "StorageV2",
+      "properties": {
+        "accessTier": "Hot"
       }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2021-08-01",
+      "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2021-08-01",
+      "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'test')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "apiVersion": "2021-01-15",
+      "name": "[variables('accountName_var')]",
+      "kind": "GlobalDocumentDB",
+      "location": "[parameters('primaryRegion')]",
+      "properties": {
+        "consistencyPolicy": "[variables('consistencyPolicy')[parameters('defaultConsistencyLevel')]]",
+        "locations": "[variables('locations')]",
+        "databaseAccountOfferType": "Standard",
+        "enableAutomaticFailover": "[parameters('automaticFailover')]"
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+      "apiVersion": "2021-01-15",
+      "name": "[format('{0}/{1}', variables('accountName_var'), parameters('databaseName'))]",
+      "properties": {
+        "resource": {
+          "id": "[parameters('databaseName')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2021-01-15",
+      "name": "[format('{0}/{1}/{2}', variables('accountName_var'), parameters('databaseName'), parameters('containerName'))]",
+      "properties": {
+        "resource": {
+          "id": "[parameters('containerName')]",
+          "partitionKey": {
+            "paths": [
+              "/records"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/myPathToNotIndex/*"
+              }
+            ]
+          },
+          "defaultTtl": 86400
+        },
+        "options": {
+          "autoscaleSettings": {
+            "maxThroughput": "[parameters('autoscaleMaxThroughput')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('accountName_var'), parameters('databaseName'))]",
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2021-10-01",
+      "name": "[parameters('cogServicesName')]",
+      "location": "[parameters('primaryRegion')]",
+      "sku": {
+        "name": "S0",
+        "tier": "Standard"
+      },
+      "kind": "CognitiveServices",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2021-10-01",
+      "name": "[parameters('languageServicesName')]",
+      "location": "[parameters('languageServicesLocation')]",
+      "sku": {
+        "name": "S"
+      },
+      "kind": "TextAnalytics",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-10-01",
+      "name": "[parameters('hostingPlanName')]",
+      "location": "[parameters('primaryRegion')]",
+      "kind": "linux",
+      "sku": {
+        "name": "B1",
+        "tier": "Basic"
+      },
+      "properties": {
+        "reserved": true
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[parameters('applicationInsightsName')]",
+      "location": "[parameters('primaryRegion')]",
+      "kind": "string",
+      "properties": {
+        "Application_Type": "web",
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('functionAppNamePython')]",
+      "location": "[parameters('primaryRegion')]",
+      "kind": "functionapp",
+      "properties": {
+        "httpsOnly": true,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
+        "clientAffinityEnabled": true,
+        "siteConfig": {
+          "linuxFxVersion": "Python|3.9",
+          "alwaysOn": true,
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))).InstrumentationKey]"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-08-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            },
+            {
+              "name": "BUILD_FLAGS",
+              "value": "UseExpressBuild"
+            },
+            {
+              "name": "ENABLE_ORYX_BUILD",
+              "value": "true"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "python"
+            },
+            {
+              "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+              "value": "1"
+            },
+            {
+              "name": "XDG_CACHE_HOME",
+              "value": "/tmp/.cache"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('functionAppName')]",
+      "location": "[parameters('primaryRegion')]",
+      "kind": "functionapp",
+      "properties": {
+        "httpsOnly": true,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
+        "clientAffinityEnabled": true,
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))).InstrumentationKey]"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-08-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-08-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "node"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "~14"
+            },
+            {
+              "name": "BLOB_STORAGE_CONTAINER",
+              "value": "test"
+            },
+            {
+              "name": "COSMOSDB_CONNECTION_STRING",
+              "value": "[format('AccountEndpoint=https://{0}.documents.azure.com:443/;AccountKey={1};', parameters('cosmosdbAccountName'), listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var')), '2021-01-15').primaryMasterKey)]"
+            },
+            {
+              "name": "COSMOSDB_CONTAINER_NAME",
+              "value": "[parameters('cosmosContainerName')]"
+            },
+            {
+              "name": "COSMOSDB_DB_NAME",
+              "value": "[parameters('cosmosDbName')]"
+            },
+            {
+              "name": "OCR_ENDPOINT",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName'))).endpoint]"
+            },
+            {
+              "name": "OCR_APIKEY",
+              "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01').key1]"
+            },
+            {
+              "name": "LANGUAGE_STUDIO_PREBUILT_ENDPOINT",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('languageServicesName'))).endpoint]"
+            },
+            {
+              "name": "LANGUAGE_STUDIO_PREBUILT_APIKEY",
+              "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('languageServicesName')), '2021-10-01').key1]"
+            },
+            {
+              "name": "LANGUAGE_STUDIO_ENDPOINT",
+              "value": "https://airangerslangcnerdemo.cognitiveservices.azure.com/text/analytics/v3.2-preview.2/analyze"
+            },
+            {
+              "name": "LANGUAGE_STUDIO_APIKEY",
+              "value": "139f689301d8486d980c6ab17b773368"
+            },
+            {
+              "name": "LANGUAGE_STUDIO_PROJECT",
+              "value": "airangerscner4"
+            },
+            {
+              "name": "FORMREC_APIKEY",
+              "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts',parameters('formrecName')),'2021-04-30').key1]"
+            },
+            {
+              "name": "FORMREC_ENDPOINT",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts',parameters('formrecName')),'2021-04-30').endpoints.FormRecognizer]"
+            },
+            {
+              "name": "SPEECH_SUB_KEY",
+              "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01').key1]"
+            },
+            {
+              "name": "SPEECH_SUB_REGION",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01', 'full').location]"
+            },
+            {
+              "name": "TRANSLATE_APIKEY",
+              "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01').key1]"
+            },
+            {
+              "name": "TRANSLATE_REGION",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName')), '2021-10-01', 'full').location]"
+            },
+            {
+              "name": "TRANSLATE_ENDPOINT",
+              "value": "https://api.cognitive.microsofttranslator.com/"
+            },
+            {
+              "name": "HUGGINGFACE_ENDPOINT",
+              "value": "[format('https://{0}.azurewebsites.net', parameters('functionAppNamePython'))]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var'))]",
+        "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'test')]",
+        "[resourceId('Microsoft.CognitiveServices/accounts', parameters('cogServicesName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]",
+        "[resourceId('Microsoft.CognitiveServices/accounts', parameters('languageServicesName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/staticSites",
+      "apiVersion": "2020-12-01",
+      "name": "[parameters('webAppName')]",
+      "location": "eastus2",
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard"
+      },
+      "properties": {
+        "provider": "GitHub",
+        "repositoryUrl": "[parameters('repositoryUrl')]",
+        "repositoryToken": "[parameters('repositoryToken')]",
+        "branch": "[parameters('branch')]",
+        "buildProperties": {
+          "apiLocation": "src/frontend/api",
+          "appLocation": "src/frontend"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/staticSites/config",
+      "apiVersion": "2020-10-01",
+      "name": "[format('{0}/{1}', parameters('webAppName'), 'appsettings')]",
+      "kind": "staticWebAppSettings",
+      "properties": {
+        "COSMOS_DB_CONNECTION_STRING": "[format('AccountEndpoint=https://{0}.documents.azure.com:443/;AccountKey={1};', parameters('cosmosdbAccountName'), listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var')), '2021-01-15').primaryMasterKey)]",
+        "COSMOS_DB_DB": "[parameters('cosmosDbName')]",
+        "COSMOS_DB_CONTAINER": "[parameters('cosmosContainerName')]",
+        "BLOB_STORAGE_CONNECTION_STRING": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-08-01').keys[0].value)]",
+        "BLOB_STORAGE_CONTAINER": "test"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'test')]",
+        "[resourceId('Microsoft.Web/staticSites', parameters('webAppName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    }
   ]
 }

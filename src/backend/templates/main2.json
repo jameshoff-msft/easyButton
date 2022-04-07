@@ -10,13 +10,16 @@
     },
     "parameters": {
       "projectName": {
-        "type": "string"
+        "type": "string",
+        "defaultValue": "bpajphtest3"
       },
       "repositoryToken": {
-        "type": "string"
+        "type": "string",
+        "defaultValue": "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"
       },
       "repositoryUrl": {
-        "type": "string"
+        "type": "string",
+        "defaultValue": "https://github.com/jameshoff-msft/easyButton"
       },
       "formrecName": {
         "type": "string",
