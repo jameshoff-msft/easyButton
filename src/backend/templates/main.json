@@ -22,10 +22,6 @@
       "type": "string",
       "defaultValue": "[parameters('projectName')]"
     },
-    "location": {
-      "type": "string",
-      "defaultValue": "[parameters('primaryRegion')]"
-    },
     "branch": {
       "type": "string",
       "defaultValue": "main"
@@ -88,7 +84,7 @@
     },
     "primaryRegion": {
       "type": "string",
-      "defaultValue": "[parameters('location')]"
+      "defaultValue": "[resourceGroup().location]"
     },
     "languageServicesLocation": {
       "type": "string",
