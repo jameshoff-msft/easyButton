@@ -9,12 +9,6 @@
     }
   },
   "parameters": {
-    "formrecName": {
-      "type": "string"
-    },
-    "location": {
-      "type": "string"
-    },
     "projectName": {
       "type": "string"
     },
@@ -23,6 +17,14 @@
     },
     "repositoryUrl": {
       "type": "string"
+    },
+    "formrecName": {
+      "type": "string",
+      "defaultValue": "[parameters('projectName')]"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[parameters('primaryRegion')]"
     },
     "branch": {
       "type": "string",
