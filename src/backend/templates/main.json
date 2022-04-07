@@ -12,9 +12,6 @@
     "formrecName": {
       "type": "string"
     },
-    "formrecResourceGroupId": {
-      "type": "string"
-    },
     "location": {
       "type": "string"
     },
@@ -25,12 +22,6 @@
       "type": "string"
     },
     "repositoryUrl": {
-      "type": "string"
-    },
-    "formrecApiKey": {
-      "type": "string"
-    },
-    "formrecEndpoint": {
       "type": "string"
     },
     "branch": {
@@ -324,7 +315,7 @@
                   {
                     "name": "[variables('formrecPrivateEndpoints')[copyIndex()].privateEndpoint.name]",
                     "properties": {
-                      "privateLinkServiceId": "[concat(parameters('formrecResourceGroupId'), '/providers/Microsoft.CognitiveServices/accounts/', parameters('formrecName'))]",
+                      "privateLinkServiceId": "[concat(resourceGroup().id, '/providers/Microsoft.CognitiveServices/accounts/', parameters('formrecName'))]",
                       "groupIds": "[variables('formrecPrivateEndpoints')[copyIndex()].privateEndpoint.properties.privateLinkServiceConnections[0].properties.groupIds]"
                     }
                   }
@@ -366,7 +357,7 @@
                   {
                     "name": "privatelink-cognitiveservices-azure-com",
                     "properties": {
-                      "privateDnsZoneId": "[concat(parameters('formrecResourceGroupId'), '/providers/Microsoft.Network/privateDnsZones/privatelink.cognitiveservices.azure.com')]"
+                      "privateDnsZoneId": "[concat(resourceGroup().id, '/providers/Microsoft.Network/privateDnsZones/privatelink.cognitiveservices.azure.com')]"
                     }
                   }
                 ]
@@ -657,11 +648,11 @@
             },
             {
               "name": "FORMREC_APIKEY",
-              "value": "[parameters('formrecApiKey')]"
+              "value": "[listkeys(resourceId('Microsoft.CognitiveServices/accounts',parameters('formrecName')),'2021-04-30').key1]"
             },
             {
               "name": "FORMREC_ENDPOINT",
-              "value": "[parameters('formrecEndpoint')]"
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts',parameters('formrecName')),'2021-04-30').endpoints.FormRecognizer]"
             },
             {
               "name": "SPEECH_SUB_KEY",
