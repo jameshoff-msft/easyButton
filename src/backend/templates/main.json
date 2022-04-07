@@ -689,25 +689,6 @@
           "[resourceId('Microsoft.CognitiveServices/accounts', parameters('languageServicesName'))]",
           "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
         ]
-      },
-      {
-        "type": "Microsoft.Web/staticSites",
-        "apiVersion": "2020-12-01",
-        "name": "[parameters('webAppName')]",
-        "location": "eastus2",
-        "sku": {
-          "name": "Standard",
-          "tier": "Standard"
-        },
-        "properties": {
-          "provider": "GitHub",
-          "repositoryUrl": "[parameters('repositoryUrl')]",
-          "repositoryToken": "[parameters('repositoryToken')]",
-          "branch": "[parameters('branch')]",
-          "buildProperties": {
-            "apiLocation": "api"
-          }
-        }
       }
   ]
 }
