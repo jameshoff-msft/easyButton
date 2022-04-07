@@ -689,6 +689,44 @@
           "[resourceId('Microsoft.CognitiveServices/accounts', parameters('languageServicesName'))]",
           "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
         ]
+      },
+      {
+        "type": "Microsoft.Web/staticSites",
+        "apiVersion": "2020-12-01",
+        "name": "[parameters('webAppName')]",
+        "location": "eastus2",
+        "sku": {
+          "name": "Standard",
+          "tier": "Standard"
+        },
+        "properties": {
+          "provider": "GitHub",
+          "repositoryUrl": "[parameters('repositoryUrl')]",
+          "repositoryToken": "[parameters('repositoryToken')]",
+          "branch": "[parameters('branch')]",
+          "buildProperties": {
+            "apiLocation": "api"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Web/staticSites/config",
+        "apiVersion": "2021-03-01",
+        "name": "[format('{0}/{1}', parameters('webAppName'), 'appsettings')]",
+        "kind": "staticWebAppSettings",
+        "properties": {
+          "COSMOS_DB_CONNECTION_STRING": "[format('AccountEndpoint=https://{0}.documents.azure.com:443/;AccountKey={1};', parameters('cosmosdbAccountName'), listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var')), '2021-01-15').primaryMasterKey)]",
+          "COSMOS_DB_DB": "[parameters('cosmosDbName')]",
+          "COSMOS_DB_CONTAINER": "[parameters('cosmosContainerName')]",
+          "BLOB_STORAGE_CONNECTION_STRING": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-08-01').keys[0].value)]",
+          "BLOB_STORAGE_CONTAINER": "test"
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName_var'))]",
+          "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'test')]",
+          "[resourceId('Microsoft.Web/staticSites', parameters('webAppName'))]",
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+        ]
       }
   ]
 }
