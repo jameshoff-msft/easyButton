@@ -708,7 +708,8 @@
           "repositoryToken": "[parameters('repositoryToken')]",
           "branch": "[parameters('branch')]",
           "buildProperties": {
-            "apiLocation": "api"
+            "apiLocation": "src/frontend/api",
+            "appLocation": "src/frontend"
           }
         }
       },
