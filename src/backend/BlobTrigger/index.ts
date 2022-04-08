@@ -6,9 +6,11 @@ import { CosmosDB } from "../services/cosmosdb"
 const _ = require('lodash')
 
 const blobTrigger: AzureFunction = async function (context: Context, myBlob: Buffer): Promise<void> {
+
+    const db = new CosmosDB(process.env.COSMOSDB_CONNECTION_STRING, process.env.COSMOSDB_DB_NAME, process.env.COSMOSDB_CONTAINER_NAME)
     try {
         context.log(`Name of source doc : ${context.bindingData.blobTrigger}`)
-        const db = new CosmosDB(process.env.COSMOSDB_CONNECTION_STRING, process.env.COSMOSDB_DB_NAME, process.env.COSMOSDB_CONTAINER_NAME)
+        
         const config = await db.getConfig()
         context.log(JSON.stringify(config.stages))
         const bpaConfig: BpaConfiguration = {
@@ -31,6 +33,13 @@ const blobTrigger: AzureFunction = async function (context: Context, myBlob: Buf
     }
     catch (err) {
         context.log(err)
+        db.view({
+            data : err,
+            type : "error",
+            label : "error",
+            projectName : "error",
+            bpaId : "error"
+        })
     }
 };
 
