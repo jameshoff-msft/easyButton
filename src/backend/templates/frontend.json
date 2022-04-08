@@ -10,7 +10,8 @@
   },
   "parameters": {
     "projectName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue" : "bpajphtest10"
     },
     "repositoryToken": {
       "type": "string"
