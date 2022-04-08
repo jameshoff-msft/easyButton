@@ -10,12 +10,10 @@
     },
     "parameters": {
       "projectName": {
-        "type": "string",
-        "defaultValue": "bpajphtest3"
+        "type": "string"
       },
       "repositoryToken": {
-        "type": "string",
-        "defaultValue": "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"
+        "type": "string"
       },
       "repositoryUrl": {
         "type": "string",
