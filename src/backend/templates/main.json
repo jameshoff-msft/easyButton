@@ -16,8 +16,7 @@
       "type": "string"
     },
     "repositoryUrl": {
-      "type": "string",
-      "defaultValue": "https://github.com/jameshoff-msft/easyButton"
+      "type": "string"
     },
     "formrecName": {
       "type": "string",
