@@ -6,6 +6,7 @@ import { BpaService } from "./types"
 import { FormRec } from "../services/formrec"
 import { Translate } from "../services/translate"
 import { HuggingFace } from "../services/huggingface"
+import { Test } from "../services/test"
 
 const ocr = new Ocr(process.env.OCR_ENDPOINT,process.env.OCR_APIKEY)
 const cosmosDb = new CosmosDB(process.env.COSMOSDB_CONNECTION_STRING,process.env.COSMOSDB_DB_NAME, process.env.COSMOSDB_CONTAINER_NAME)
@@ -14,6 +15,7 @@ const speech = new Speech(process.env.SPEECH_SUB_KEY,process.env.SPEECH_SUB_REGI
 const formrec = new FormRec(process.env.FORMREC_ENDPOINT, process.env.FORMREC_APIKEY)
 const translate = new Translate(process.env.TRANSLATE_ENDPOINT, process.env.TRANSLATE_APIKEY, process.env.TRANSLATE_REGION)
 const huggingface = new HuggingFace(process.env.HUGGINGFACE_ENDPOINT)
+const test = new Test()
 
 const translateService : BpaService = {
     bpaServiceId : "abc123",
@@ -21,6 +23,20 @@ const translateService : BpaService = {
     outputTypes: ["text"],
     name: "translate",
     process: translate.translate,
+    serviceSpecificConfig: {
+        
+    },
+    serviceSpecificConfigDefaults: {
+
+    }
+}
+
+const testService : BpaService = {
+    bpaServiceId : "abc123",
+    inputTypes: ["pdf","jpg","png","jpeg"],
+    outputTypes: ["test"],
+    name: "test",
+    process: test.process,
     serviceSpecificConfig: {
         
     },
@@ -345,6 +361,7 @@ export const serviceCatalog = {
     "recognizeLinkedEntities" : recognizeLinkedEntities,
     "recognizePiiEntities" : recognizePiiEntities,
     "singleCategoryClassify" : singleCategoryClassify,
-    "huggingFaceNER" : huggingFaceNER
+    "huggingFaceNER" : huggingFaceNER,
+    "testService" : testService
 }
 
