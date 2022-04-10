@@ -33,7 +33,7 @@ export const sc = {
         "image": pdf,
         "label": "Test Prebuilt Models",
         "name": "test",
-        "serviceSpecificConfig": {},
+        "serviceSpecificConfig": { "to":"es"},
         "serviceSpecificConfigDefaults": {}
     },
     "pdf": {
