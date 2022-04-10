@@ -22,6 +22,20 @@ import storage from './images/storage.svg'
 import wav from './images/wav.svg'
 
 export const sc = {
+    "test": {
+        "bpaServiceId": "abc123",
+        "inputTypes": [
+            "pdf"
+        ],
+        "outputTypes": [
+            "test"
+        ],
+        "image": pdf,
+        "label": "Test Prebuilt Models",
+        "name": "test",
+        "serviceSpecificConfig": {},
+        "serviceSpecificConfigDefaults": {}
+    },
     "pdf": {
         "bpaServiceId": "abc123",
         "inputTypes": [
