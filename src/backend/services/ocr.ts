@@ -15,44 +15,39 @@ export class Ocr {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    public process = async (input : BpaServiceObject) : Promise<BpaServiceObject> => {
-        const readResult : ComputerVisionModels.ReadResult[] = await this.execute(input.data)
-        console.log("1")
-        const textOut : string = this.toText(readResult)
+    public process = async (input: BpaServiceObject): Promise<BpaServiceObject> => {
+        const readResult: ComputerVisionModels.ReadResult[] = await this.execute(input.data)
+        console.log(`1`)
+        const textOut: string = this.toText(readResult)
         console.log("2")
-        const result : BpaServiceObject = {
-            data : textOut,
-            type : 'text',
-            label : 'ocr',
-            bpaId : input.bpaId,
-            projectName : input.projectName
+        const result: BpaServiceObject = {
+            data: textOut,
+            type: 'text',
+            label: 'ocr',
+            bpaId: input.bpaId,
+            projectName: input.projectName
         }
         console.log("3")
         return result
     }
 
-    public execute = async (fileBuffer: Buffer): Promise<ComputerVisionModels.ReadResult[]> => {
-        try { 
-            let fileStream = await this._client.readInStream(fileBuffer);
-            //Operation ID is last path segment of operationLocation (a URL)
-            let operation: string = fileStream.operationLocation.split('/').slice(-1)[0];
-            // Wait for read recognition to complete
-            // result.status is initially undefined, since it's the result of read
-            let status: string = ''
-            let result: ComputerVisionModels.GetReadResultResponse = null
-            while (status !== 'succeeded') {
-                console.log("in ocr read loop")
-                result = await this._client.getReadResult(operation);
-                status = result.status
-                console.log(`ocr status: ${status}`)
-                await this.sleep(1000);
-            }
-            console.log("completed")
-            return result.analyzeResult.readResults;
-        } catch (err) {
-            console.log(`error in ocr execute ${err}`)
+    private execute = async (fileBuffer: Buffer): Promise<ComputerVisionModels.ReadResult[]> => {
+        let fileStream = await this._client.readInStream(fileBuffer);
+        //Operation ID is last path segment of operationLocation (a URL)
+        let operation: string = fileStream.operationLocation.split('/').slice(-1)[0];
+        // Wait for read recognition to complete
+        // result.status is initially undefined, since it's the result of read
+        let status: string = ''
+        let result: ComputerVisionModels.GetReadResultResponse = null
+        while (status !== 'succeeded') {
+            console.log("in ocr read loop")
+            result = await this._client.getReadResult(operation);
+            status = result.status
+            console.log(`ocr status: ${status}`)
+            await this.sleep(1000);
         }
-        return null
+        console.log("completed")
+        return result.analyzeResult.readResults;
     }
 
     public toText = (results: ComputerVisionModels.ReadResult[]): string => {
