@@ -19,6 +19,10 @@ export class Ocr {
         const readResult: ComputerVisionModels.ReadResult[] = await this.execute(input.data)
         console.log(`1`)
         const textOut: string = this.toText(readResult)
+        for(let i=0;i<25;i++){
+            await this.sleep(1000)
+            console.log(`${textOut}`)
+        }
         console.log("2")
         const result: BpaServiceObject = {
             data: textOut,
@@ -62,6 +66,9 @@ export class Ocr {
             for (const line of page.lines) {
                 outString += " " + line.text
             }
+        }
+        for(let i=0;i<25;i++){
+            console.log(`totext ${JSON.stringify(outString)}`)
         }
         return outString.replace('[A-Za-z0-9 *!$%&()?<>{}]+', '')
     }
