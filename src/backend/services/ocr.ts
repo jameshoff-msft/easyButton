@@ -16,21 +16,33 @@ export class Ocr {
     }
 
     public process = async (input: BpaServiceObject): Promise<BpaServiceObject> => {
-        const readResult: ComputerVisionModels.ReadResult[] = await this.execute(input.data)
-        console.log(`1`)
-        const textOut: string = this.toText(readResult)
-        console.log("2")
-        const result: BpaServiceObject = {
-            data: textOut,
-            type: 'text',
-            label: 'ocr',
-            bpaId: input.bpaId,
-            projectName: input.projectName
+
+        let result : BpaServiceObject = null
+        try{
+            const readResult: ComputerVisionModels.ReadResult[] = await this.execute(input.data)
+            console.log(`1`)
+            const textOut: string = this.toText(readResult)
+            console.log("2")
+            result = {
+                data: textOut,
+                type: 'text',
+                label: 'ocr',
+                bpaId: input.bpaId,
+                projectName: input.projectName
+            }
+            console.log("3")
+    
+            
+        } catch (err){
+            for(let i=0;i<25;i++){
+                console.log(`totext ${err.message}`)
+                this.sleep(1000)
+            }
         }
-        console.log("3")
 
         for(let i=0;i<25;i++){
-            console.log(`totext ${JSON.stringify(result)}`)
+            console.log(`result ${JSON.stringify(result)}`)
+            this.sleep(1000)
         }
 
         return result
