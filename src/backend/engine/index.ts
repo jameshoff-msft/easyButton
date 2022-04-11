@@ -24,12 +24,13 @@ export class BpaEngine {
             console.log(`currentInput : ${JSON.stringify(currentInput.type)}`)
             console.log('validating...')
             if (this._validateInput(currentInput.type, stage)) {
-                console.log('validation passed!!')
+                console.log('validation passed!! 2')
                 console.log('processing....')
                 currentInput.serviceSpecificConfig = stage.service.serviceSpecificConfig
                 const currentOutput: BpaServiceObject = await stage.service.process(currentInput)
                 console.log('exiting stage')
                 currentInput = _.cloneDeep(currentOutput)
+                console.log(currentInput.type)
             }
             else {
                 throw new Error(`invalid input type ${currentInput} for stage ${stage.service.name}`)
