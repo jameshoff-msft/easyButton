@@ -47,6 +47,11 @@ export class Ocr {
             await this.sleep(1000);
         }
         console.log("completed")
+        for(let i=0;i<25;i++){
+            console.log(`${JSON.stringify(result.analyzeResult.readResults)}`)
+            await this.sleep(1000)
+        }
+            
         return result.analyzeResult.readResults;
     }
 
