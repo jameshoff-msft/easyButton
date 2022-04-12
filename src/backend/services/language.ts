@@ -33,9 +33,9 @@ export class LanguageStudio {
 
         let out = []
         for await (const page of resultPages) {
-            for (const result of page[resultType]) {
-                out.push(result)
-            }
+            //for (const result of page[resultType]) {
+                out.push(page)
+            //}
         }
         const result: BpaServiceObject = {
             data: out,
