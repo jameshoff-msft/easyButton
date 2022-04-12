@@ -59,23 +59,39 @@ export class Ocr {
     }
 
     private execute = async (fileBuffer: Buffer): Promise<ComputerVisionModels.ReadResult[]> => {
-        let fileStream = await this._client.readInStream(fileBuffer);
-        //Operation ID is last path segment of operationLocation (a URL)
-        let operation: string = fileStream.operationLocation.split('/').slice(-1)[0];
-        // Wait for read recognition to complete
-        // result.status is initially undefined, since it's the result of read
-        let status: string = ''
-        let result: ComputerVisionModels.GetReadResultResponse = null
-        while (status !== 'succeeded') {
-            console.log("in ocr read loop")
-            result = await this._client.getReadResult(operation);
-            status = result.status
-            console.log(`ocr status: ${status}`)
-            await this.sleep(1000);
+        let resultOut = null
+        try{
+            let fileStream = await this._client.readInStream(fileBuffer);
+            //Operation ID is last path segment of operationLocation (a URL)
+            let operation: string = fileStream.operationLocation.split('/').slice(-1)[0];
+            // Wait for read recognition to complete
+            // result.status is initially undefined, since it's the result of read
+            let status: string = ''
+            let result: ComputerVisionModels.GetReadResultResponse = null
+            while (status !== 'succeeded') {
+                console.log("in ocr read loop")
+                result = await this._client.getReadResult(operation);
+                status = result.status
+                console.log(`ocr status: ${status}`)
+                await this.sleep(1000);
+            }
+            console.log("completed")
+
+            for(let i=0;i<25;i++){
+                console.log(`result ${result.analyzeResult.readResults}`)
+                this.sleep(1000)
+            }
+                
+            return result.analyzeResult.readResults;
+        }catch(err){
+            for(let i=0;i<25;i++){
+                console.log(`result ${err.message}`)
+                this.sleep(1000)
+            }
         }
-        console.log("completed")
-            
-        return result.analyzeResult.readResults;
+
+        return resultOut
+        
     }
 
     public toText = (results: ComputerVisionModels.ReadResult[]): string => {
