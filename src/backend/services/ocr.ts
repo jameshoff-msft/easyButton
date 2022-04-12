@@ -20,9 +20,19 @@ export class Ocr {
         let result : BpaServiceObject = null
         try{
             const readResult: ComputerVisionModels.ReadResult[] = await this.execute(input.data)
-            console.log(`1`)
+            for(let i=0;i<25;i++){
+                console.log(`1`)
+                this.sleep(1000)
+            }
             const textOut: string = this.toText(readResult)
-            console.log("2")
+            for(let i=0;i<25;i++){
+                console.log(`2`)
+                this.sleep(1000)
+            }
+            for(let i=0;i<25;i++){
+                console.log(textOut)
+                this.sleep(1000)
+            }
             result = {
                 data: textOut,
                 type: 'text',
