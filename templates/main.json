@@ -490,8 +490,8 @@
       "location": "[parameters('primaryRegion')]",
       "kind": "linux",
       "sku": {
-        "name": "B1",
-        "tier": "Basic"
+        "name": "P2v2",
+        "tier": "PremiumV2"
       },
       "properties": {
         "reserved": true
