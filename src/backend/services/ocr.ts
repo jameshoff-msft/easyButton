@@ -15,52 +15,24 @@ export class Ocr {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    public process = async (input: BpaServiceObject): Promise<BpaServiceObject> => {
-
-        let result : BpaServiceObject = null
-        try{
-            const readResult: ComputerVisionModels.ReadResult[] = await this.execute(input.data)
-            for(let i=0;i<25;i++){
-                console.log(`1`)
-                this.sleep(1000)
-            }
-            const textOut: string = this.toText(readResult)
-            for(let i=0;i<25;i++){
-                console.log(`2`)
-                this.sleep(1000)
-            }
-            for(let i=0;i<25;i++){
-                console.log(textOut)
-                this.sleep(1000)
-            }
-            result = {
-                data: textOut,
-                type: 'text',
-                label: 'ocr',
-                bpaId: input.bpaId,
-                projectName: input.projectName
-            }
-            console.log("3")
-    
-            
-        } catch (err){
-            for(let i=0;i<25;i++){
-                console.log(`totext ${err.message}`)
-                this.sleep(1000)
-            }
+    public process = async (input : BpaServiceObject) : Promise<BpaServiceObject> => {
+        const readResult : ComputerVisionModels.ReadResult[] = await this.execute(input.data)
+        console.log("1")
+        const textOut : string = this.toText(readResult)
+        console.log("2")
+        const result : BpaServiceObject = {
+            data : textOut,
+            type : 'text',
+            label : 'ocr',
+            bpaId : input.bpaId,
+            projectName : input.projectName
         }
-
-        for(let i=0;i<25;i++){
-            console.log(`result ${JSON.stringify(result)}`)
-            this.sleep(1000)
-        }
-
+        console.log("3")
         return result
     }
 
-    private execute = async (fileBuffer: Buffer): Promise<ComputerVisionModels.ReadResult[]> => {
-        let resultOut = null
-        try{
+    public execute = async (fileBuffer: Buffer): Promise<ComputerVisionModels.ReadResult[]> => {
+        try { 
             let fileStream = await this._client.readInStream(fileBuffer);
             //Operation ID is last path segment of operationLocation (a URL)
             let operation: string = fileStream.operationLocation.split('/').slice(-1)[0];
@@ -76,22 +48,11 @@ export class Ocr {
                 await this.sleep(1000);
             }
             console.log("completed")
-
-            for(let i=0;i<25;i++){
-                console.log(`result ${result.analyzeResult.readResults}`)
-                this.sleep(1000)
-            }
-                
             return result.analyzeResult.readResults;
-        }catch(err){
-            for(let i=0;i<25;i++){
-                console.log(`result ${err.message}`)
-                this.sleep(1000)
-            }
+        } catch (err) {
+            console.log(`error in ocr execute ${err}`)
         }
-
-        return resultOut
-        
+        return null
     }
 
     public toText = (results: ComputerVisionModels.ReadResult[]): string => {
